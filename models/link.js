@@ -1,8 +1,9 @@
-import mongoose from "mongoose";
 
-const  linkSchema=new mongoose.Schema({
-    _id: Number,
-    originalUrl: String
+import mongoose from "mongoose";
+const LinkSchema = mongoose.Schema({
+    originUrl: {
+        type: String,
+        default: ''
+    }
 })
-const linkModel=mongoose.model("link",linkSchema);
-export default linkModel;
+export default mongoose.model("link", LinkSchema)

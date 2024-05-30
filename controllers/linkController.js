@@ -1,60 +1,66 @@
-import Link from '../models/link.js';
-import User from '../models/user.js';
+import linkModel from '../models/link.js';
 
-export const createLink = async (req, res) => {
-  const { userId, originalUrl } = req.body;
-
+const linkController={
+getList: async (req, res) => {
   try {
-    const link = new Link({ originalUrl });
-    await link.save();
-
-    const user = await User.findById(userId);
-    user.links.push(link._id);
-    await user.save();
-
-    res.status(201).json(link);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+      console.log("im here!!!");
+      const links = await linksModel.find()
+      console.log( "links", links)
+      res.json({ links })
   }
-};
+  catch (e) {
+      res.status(400).json({ message: e.message })
+  }
+},
 
-export const getLinks = async (req, res) => {
+getById: async (req, res) => {
+  const linkId = req.params.id
   try {
-    const links = await Link.find();
-    res.status(200).json(links);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+      const link = await linkModel.findById(linkId)
+      console.log({ link })
+      res.json({ link })
   }
-};
+  catch (e) {
+      res.status(400).json({ message: e.message })
+  }
+},
 
-export const getLink = async (req, res) => {
+add: async (req, res) => {
+  const {originalUrl } = req.body
   try {
-    const link = await Link.findById(req.params.id);
-    if (!link) return res.status(404).json({ message: 'Link not found' });
-    res.status(200).json(link);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+      const newLink = await linkModel.create({originalUrl })
+      res.json({ newLink })
   }
-};
+  catch (e) {
+      res.status(400).json({ message: e.message })
+  }
+},
 
-export const deleteLink = async (req, res) => {
+update: async (req, res) => {
+  const { id } = req.params.id
   try {
-    const link = await Link.findById(req.params.id);
-    if (!link) return res.status(404).json({ message: 'Link not found' });
-
-    await link.remove();
-    res.status(200).json({ message: 'Link deleted' });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+      const updateLink = await linkModel.findByIdAndUpdate(id, req.body, {
+          new: true
+      })
+      res.json({ updateLink })
   }
-};
+  catch (e) {
+      res.status(400).json({ message: e.message })
+  }
+},
 
-export const updateLink = async (req, res) => {
+
+
+delete: async (req, res) => {
+  const { id } = req.params
   try {
-    const link = await Link.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!link) return res.status(404).json({ message: 'Link not found' });
-    res.status(200).json(link);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+      const deleteLink = await linkModel.findByIdAndDelete(id)
+      res.json({ deleteLink })
   }
-};
+  catch (e) {
+      res.status(400).json({ message: e.message })
+  }
+}
+}
+
+export default linkController

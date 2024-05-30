@@ -1,74 +1,63 @@
-import User from '../models/User.js';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import userModel from "../models/user.js"
 
-export const registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
+const userController = {
+    getList: async (req, res) => {
+        try {
+            console.log("im here!!!");
+            const users = await userModel.find()
+            console.log( "users", users)
+            res.json({ users })
+        }
+        catch (e) {
+            res.status(400).json({ message: e.message })
+        }
+    },
 
-  try {
-    const user = new User({ name, email, password });
-    await user.save();
-    res.status(201).json(user);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-};
+    getById: async (req, res) => {
+        const userId = req.params.id
+        try {
+            const user = await userModel.findById(userId)
+            console.log({ user })
+            res.json({ user })
+        }
+        catch (e) {
+            res.status(400).json({ message: e.message })
+        }
+    },
 
-export const loginUser = async (req, res) => {
-  const { email, password } = req.body;
+    add: async (req, res) => {
+        const { idNumber, name, email, password, links } = req.body
+        try {
+            const newUser = await userModel.create({ idNumber, name, email, password, links })
+            res.json({ newUser })
+        }
+        catch (e) {
+            res.status(400).json({ message: e.message })
+        }
+    },
 
-  try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+    update: async (req, res) => {
+        const { id } = req.params.id
+        try {
+            const updateUser = await userModel.findByIdAndUpdate(id, req.body, {
+                new: true
+            })
+            res.json({ updateUser })
+        }
+        catch (e) {
+            res.status(400).json({ message: e.message })
+        }
+    },
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
-
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
-    res.status(200).json({ token });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-export const getUsers = async (req, res) => {
-  try {
-    const users = await User.find().populate('links');
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-export const getUser = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id).populate('links');
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-export const deleteUser = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-
-    await user.remove();
-    res.status(200).json({ message: 'User deleted' });
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-};
-
-export const updateUser = async (req, res) => {
-  try {
-    const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true }).populate('links');
-    if (!user) return res.status(404).json({ message: 'User not found' });
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
-  }
-};
+    delete: async (req, res) => {
+        const { id } = req.params
+        try {
+            const deleteUser = await userModel.findByIdAndDelete(id)
+            res.json({ deleteUser })
+        }
+        catch (e) {
+            res.status(400).json({ message: e.message })
+        }
+    }
+}
+export default userController

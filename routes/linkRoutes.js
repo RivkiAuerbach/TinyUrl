@@ -1,12 +1,12 @@
-import express from 'express';
-import { createLink, getLinks, getLink, deleteLink, updateLink } from '../controllers/linkController.js';
+import express from 'express'
+import linkController from '../controllers/linkController.js'
 
-const router = express.Router();
+const LinksRouter = express.Router()
 
-router.post('/', createLink);
-router.get('/', getLinks);
-router.get('/:id', getLink);
-router.put('/:id', updateLink);
-router.delete('/:id', deleteLink);
+LinksRouter.get("/:id", linkController.getById)
+LinksRouter.get("/", linkController.getList)
+LinksRouter.post("/", linkController.add)
+LinksRouter.put("/:id", linkController.update)
+LinksRouter.delete("/:id", linkController.delete)
 
-export default router;
+export default LinksRouter
