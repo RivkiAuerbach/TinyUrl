@@ -1,6 +1,7 @@
 import userModel from "../models/user.js"
 
 const userController = {
+    
     getList: async (req, res) => {
         try {
             console.log("im here!!!");

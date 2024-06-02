@@ -1,7 +1,6 @@
 import dotenv from 'dotenv'
 import express from 'express'
 import cors from 'cors'
-
 import connectDB from './database.js'
 import UserRouter from './routes/userRoutes.js'
 import LinksRouter from './routes/linkRoutes.js'
